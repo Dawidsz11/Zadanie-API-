@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikacja Pogodowa</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #5990c6;
+        }
+
+        .container {
+            margin-top: 50px;
+        }
+
+        #weatherInfo {
+            margin-top: 20px;
+        }
+        #glowne{
+          width: 100px;
+          height: 100px;
+         
+        }
+        .card{
+            background-color: rgb(107, 177, 181);
+        }
+        .btn{
+            background-color: lightgray;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Raport Pogodowy</h1> <img id="glowne" src="chm.png" alt="Obrazek chmur" >
+
+    <!-- Formularz do wyboru parametrów -->
+    <form id="weatherForm">
+        <div class="mb-3">
+            <label for="city">Wybierz Miasto:</label>
+            <!-- Pole tekstowe do wprowadzenia nazwy miasta -->
+            <input type="text" id="city" name="city" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="units">Jednostki:</label>
+            <!-- Lista rozwijana do wyboru jednostek -->
+            <select id="units" name="units">
+                <option value="metric">Metryczne</option>
+                <option value="imperial">Imperialne</option>
+                <option value="standard">Standardowe</option>
+            </select>
+        </div>
+
+        <button type="button" class="btn" onclick="fetchWeatherData()">Pobierz Pogodę</button>
+    </form>
+    <!-- Wyświetlanie informacji o pogodzie -->
+    <div id="weatherInfo" class="mt-4"></div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    ///Funkcja Pobiera dane o pogodzie z OpenWeatgerMap API na podstawie wybranych parametrów użytkownika
+    function fetchWeatherData() {
+        const city = $("#city").val();  
+        const units = $("#units").val();
+        // Klucz API
+        const apiKey = "1e48f61dcf24280baaae39b0700e2331";
+        // Adres URL końcowy API
+        const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=${units}&appid=${apiKey}`;
+
+        // Wykonje zapytanie AJAX które pobiera dane z serwera które sa przekazane do funkcji.
+        $.ajax({
+            url: apiUrl,
+            dataType: "json",
+            success: function (data) {
+                displayWeatherData(data);
+            },
+            error: function () {
+                alert("Błąd podczas pobierania danych o pogodzie.");
+            }
+        });
+    }
+
+    // Funkcja do wyświetlania danych o pogodzie. Funkcja ma za zadanie wyświetlenia danych poprzez dynamicznie generwoaną karte
+    function displayWeatherData(weatherData) { 
+        const weatherInfoContainer = $("#weatherInfo");
+
+        // Czyści poprzednie wyniki
+        weatherInfoContainer.empty(); 
+
+        // Kontener z informacjami o pogodzie
+        const weatherInfoHtml = `
+             <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">${weatherData.name}</h5>
+                    <p class="card-text"><b>Temperatura:</b> ${weatherData.main.temp} &deg;C</p>  
+                    <p class="card-text"><b>Wilgotność:</b> ${weatherData.main.humidity}%</p>
+                    <p class="card-text"><b>Pogoda:</b> ${weatherData.weather[0].description}</p>
+                </div>
+            </div>`;
+        // Dodaje informacje o pogodzie do kontenera
+        weatherInfoContainer.append(weatherInfoHtml);
+    }
+</script>
+
+</body>
+</html>
